@@ -31088,6 +31088,15 @@
 
 /***/ },
 /* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = function(app) {
+	  __webpack_require__(4)(app);
+	};
+
+
+/***/ },
+/* 4 */
 /***/ function(module, exports) {
 
 	module.exports = function(app) {
