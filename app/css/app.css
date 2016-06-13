@@ -1,0 +1,14 @@
+main ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+span.game-input {
+  color: #0000FF;
+}
+span.command-input {
+  color: #008000;
+}
+span.user-input {
+  color: #FF0000;
+}

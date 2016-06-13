@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>adventure</title>
+    <link rel="stylesheet" href="app.css">
+    <!-- endbuild -->
+</head>
+
+<body data-ng-app="adventureApp">
+    <div class="game-container">
+        <div class="game-console">
+            <textarea class="game-console-textbox" ng-model="gameController" spellcheck="false" readonly></textarea>
+        </div>
+        <div class="game-input-container" ng-cloak>
+            <span class="game-input-prompt">&gt;</span>
+            <span class="game-input-text" ng-bind="gameController"></span>
+            <span class="game-input-cursor">_</span>
+            <input type="text" maxlength="30" class="game-input" ng-model="gameController" ng-keydown="gameController.executeInput($event)" autofocus>
+        </div>
+    </div>
+    <!-- build:js scripts/main.js -->
+    <script src="bundle.js"></script>
+    <!-- endbuild -->
+</body>
+
+</html>
