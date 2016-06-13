@@ -11,7 +11,7 @@
 
 <body data-ng-app="adventureApp">
 
-    <main data-ng-controller="GameController" data-ng-init="startGame()">
+    <main data-ng-controller="GameController" ng-cloak data-ng-init="startGame()">
         <h1>Adventure App:</h1>
 
 
@@ -23,7 +23,7 @@
             <button type="submit">Go</button>
         </form>
 
-        <ul id="inputlog">
+        <ul id="inputlog" >
             <li data-ng-repeat="item in model.gamelog">
                 <span class="{{item.src}}-input">{{item.msg}}
                 </span>

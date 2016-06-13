@@ -44,14 +44,22 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(1);
+	const angular = __webpack_require__(1);
 
 	var adventureApp = angular.module('adventureApp', []);
-	__webpack_require__(2)(adventureApp);
+	__webpack_require__(3)(adventureApp);
 
 
 /***/ },
 /* 1 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(2);
+	module.exports = angular;
+
+
+/***/ },
+/* 2 */
 /***/ function(module, exports) {
 
 	/**
@@ -31079,7 +31087,7 @@
 	!window.angular.$$csp().noInlineStyle && window.angular.element(document.head).prepend('<style type="text/css">@charset "UTF-8";[ng\\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}ng\\:form{display:block;}.ng-animate-shim{visibility:hidden;}.ng-anchor{position:absolute;}</style>');
 
 /***/ },
-/* 2 */
+/* 3 */
 /***/ function(module, exports) {
 
 	module.exports = function(app) {
@@ -31092,94 +31100,121 @@
 	      location: {
 	        'start': {
 	          commands: ['Enter ? for available commands at any time.'],
-	          prompts: ['Welcome to the Adventure. You are in a room with a monster.']
+	          prompt: 'Welcome to the Adventure. You are in a room with a monster.'
 	        },
 	        'weaponroom': {
-	          commands: [],
-	          prompts: []
+	          commands: ['take hammer', 'look for treasure', 'say <message>', 'walk through door'],
+	          prompt: 'You are in the weapon room. There is a large hammer in the corner.'
 	        },
-	        'monsterroom': {
-	          commands: [],
-	          prompts: []
+	        'monsterroomwithoutweapon': {
+	          commands: ['walk through door', 'say <message>'],
+	          prompt: 'You are in a room with a monster.'
+	        },
+	        'monsterroomwithweapon': {
+	          commands: ['throw hammer'],
+	          prompt: 'You are in a room with a monster and you have a weapon.'
 	        }
 	      }
 	    };
 	    $scope.startGame = function() {
-	      $scope.model.location.start.prompts.forEach(function(item) {
-	        $scope.model.gamelog.push({src:'game',msg:item});
+	      $scope.model.gamelog = []; //clear
+	      $scope.model.userLocation = 'start';
+	      $scope.model.userHasWeapon = false;
+	      $scope.model.command = '';
+	      $scope.model.gamelog.push({
+	        src: 'game',
+	        msg: $scope.model.location.start.prompt
 	      });
 	      $scope.model.location.start.commands.forEach(function(item) {
-	        $scope.model.gamelog.push({src:'command',msg:item});
+	        $scope.model.gamelog.push({
+	          src: 'command',
+	          msg: item
+	        });
 	      });
+	      $scope.model.userLocation = 'monsterroomwithoutweapon';
 	    };
 	    $scope.processInput = function() {
+
+
 	      $scope.model.gamelog.push({
 	        src: 'user',
 	        msg: $scope.model.command
 	      });
-	      if ($scope.model.command === '?') {
+
+	      switch ($scope.model.command) {
+	      case '?':
 	        $scope.model.gamelog.push({
 	          src: 'game',
 	          msg: $scope.currentHelpMsg()
 	        });
+	        break;
+	      case 'walk through door':
+	          //set location
+	        var currentLocation = $scope.model.userLocation;
+	        if (currentLocation === 'weaponroom') {
+	          currentLocation = $scope.model.userLocation = $scope.model.userHasWeapon ? 'monsterroomwithweapon' : 'monsterroomwithoutweapon';
+	          $scope.model.gamelog.push({
+	            src: 'game',
+	            msg: $scope.model.location[currentLocation].prompt
+	          });
+	        } else {
+	          $scope.model.userLocation = 'weaponroom';            $scope.model.gamelog.push({
+	            src: 'game',
+	            msg: $scope.model.location.weaponroom.prompt
+	          });
+	        }
+
+
+	        $scope.model.gamelog.push({
+	          src: 'game',
+	          msg: $scope.currentHelpMsg()
+	        });
+	        break;
+
+	      case 'take hammer':
+	        $scope.model.userHasWeapon = true;
+	        break;
+
+	      default:
+
+	          //test for say <message>
+	        var sayArr = $scope.model.command.split(' ');
+	        if (sayArr[0] === 'say') {
+	          $scope.model.gamelog.push({
+	            src: 'game',
+	            msg: sayArr[1] || 'SAY SOMETHING!'
+	          });
+	        } else {
+	          $scope.model.gamelog.push({
+	            src: 'game',
+	            msg: 'BAD COMMAND: Enter ? to see commands'
+	          });
+	        }
 	      }
+	      $scope.model.command = ''; //clear command after processing
+
 	    };
 	    $scope.currentHelpMsg = function() {
-	      if ($scope.model.userLocation === 'start') {
-	        return 'You are in a room with a monster. Go to the tool room, get a bat, come back and whack him.';
+	      var str = '';
+	      switch ($scope.model.userLocation) {
+
+	      case 'weaponroom':
+	        $scope.model.location.weaponroom.commands.forEach(function(item, index) {
+	          str += index > 0 ? ' | ' : '';
+	          str += item;
+	        });
+	        break;
+
+	      case 'monsterroomwithoutweapon':
+	        $scope.model.location.monsterroomwithoutweapon.commands.forEach(function(item, index) {
+	          str += index > 0 ? ' | ' : '';
+	          str += item;
+	        });
+	        break;
 	      }
+	      return str;
 	    };
 
-	    // $scope.getAll = function() {
-	    //   $http.get('/api/notes')
-	    //     .then(function(res) {
-	    //       $scope.notes = res.data;
-	    //     }, function(res) {
-	    //       console.log(res);
-	    //     });
-	    // };
-
-	    // $scope.createNote = function(note) {
-	    //   $http.post('/api/notes', note)
-	    //     .then(function(res) {
-	    //       $scope.notes.push(res.data);
-	    //       $scope.newNote = null;
-	    //     }, function(res) {
-	    //       console.log(res);
-	    //     });
-	    // };
-	    //
-	    // $scope.updateNote = function(note) {
-	    //   note.status = 'pending';
-	    //   $http.put('/api/notes/' + note._id, note)
-	    //     .then(function(res) {
-	    //       delete note.status;
-	    //       note.editing = false;
-	    //     }, function(res) {
-	    //       console.log(res);
-	    //       note.status = 'failed';
-	    //       note.editing = false;
-	    //     });
-	    // };
-	    //
-	    // $scope.removeNote = function(note) {
-	    //   note.status = 'pending';
-	    //   $http.delete('/api/notes/' + note._id)
-	    //     .then(function() {
-	    //       $scope.notes.splice($scope.notes.indexOf(note), 1);
-	    //     }, function(res) {
-	    //       note.status = 'failed';
-	    //       console.log(res);
-	    //     });
-	    // };
-
-	    // {
-	  //   src: 'game',
-	  //   msg: 'Welcome to the Adventure. You are in a room with a monster.'
-	  // }, {
-	  //   src: 'command',
-	  //   msg: 'Enter ? for available commands at any time.'
-	  // }
 	  }]);
 	};
 
